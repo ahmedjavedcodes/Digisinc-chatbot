@@ -15,6 +15,11 @@ from langchain_chroma import Chroma
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.document_loaders import PyPDFLoader
 
+
+from pinecone import Pinecone
+from langchain_pinecone import PineconeVectorStore
+
+
 load_dotenv()
 
 app = FastAPI(title="Digisinc AI Backend")
@@ -30,6 +35,18 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     question: str
 
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+index_name = "digisinc-index"
+
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+# Connect to existing Pinecone index (Ensure you've uploaded data once)
+vector_store = PineconeVectorStore(index_name=index_name, embedding=embeddings)
+
+retriever = vector_store.as_retriever(
+    search_type="mmr",
+    search_kwargs={'k': 5, 'fetch_k': 10, 'lambda_mult': 0.4}
+)
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -38,38 +55,6 @@ llm = ChatGroq(
     max_tokens=None,
     timeout=None,
     max_retries=3
-)
-
-loader = PyPDFLoader("../Agency.pdf")
-
-pages = loader.load()
-
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 1200,
-    chunk_overlap = 120,
-    separators=["\n\n","\n"," ",""]
-)
-
-split_docs = splitter.split_documents(pages)
-
-# print(len(split_docs))
-
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-vector_store = Chroma.from_documents(
-    documents = split_docs,
-    embedding = embeddings,
-    persist_directory = "./Agency_vectorDb"
-)
-
-
-retriever = vector_store.as_retriever(
-    search_type="mmr",
-    search_kwargs={
-        'k': 8,
-        'fetch_k': 16, 
-        'lambda_mult': 0.4
-    }
 )
 
 template = """
