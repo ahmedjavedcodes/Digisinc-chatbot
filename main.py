@@ -22,7 +22,7 @@ print(f"Logged in as: {api.whoami()['name']}")
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     groq_api_key=os.getenv("GROQ_API_KEY"),
-    temperature=0.2,
+    temperature=0.3,
     max_tokens=None,
     timeout=None,
     max_retries=3,
@@ -48,13 +48,38 @@ docs = markdown_splitter.split_text(markdown_content)
 
 # splitting the loaded document 
 
+custom_separators = [
+    "\n# ",   # Agency (h1)
+    "\n## ",  # Section (h2)
+    "\n### ", # Sub-section (h3)
+    "\n#### ",# Topic (h4)
+    "\n\n",   # Double Newline (Paragraphs)
+    "\n- ",   # Bullets (Dashes)
+    "\n* ",   # Bullets (Asterisks)
+    "\n",     # Single Newline (Line breaks)
+    " ",      # Spaces
+    ""        # Characters
+]
+
 splitter = RecursiveCharacterTextSplitter(
     chunk_size = 1000, 
-    chunk_overlap = 100,
-    separators=["\n## ", "\n### ", "\n#### ", "\n\n", "\n|", "\n"]
+    chunk_overlap = 200,
+    separators = custom_separators
 )
 
 split_docs = splitter.split_documents(docs)
+
+print(f"Total chunks created: {len(split_docs)}\n")
+
+for i, doc in enumerate(split_docs):
+    # Print the chunk index and the headers the splitter identified
+    print(f"--- CHUNK {i} ---")
+    print(f"Metadata (Headers): {doc.metadata}")
+    
+    # Print the first 100 characters to see the content
+    content_snippet = doc.page_content.replace('\n', ' ')[:120]
+    print(f"Content Snippet: {content_snippet}...")
+    print("-" * 20 + "\n")
 
 # create embeddings and store in a vector database
 
@@ -69,22 +94,30 @@ vector_store = Chroma.from_documents(
 # retriever to retrieve from vector database 
 
 retriever = vector_store.as_retriever(
-    search_type = "mmr",
-    search_kwargs={'k': 8}
+    search_type="mmr",
+    search_kwargs={
+        'k': 10,
+        'fetch_k': 40,
+        'lambda_mult': 0.5  # Lowered from 0.6 for more diversity
+    }
 )
 
 
-# prompt template 
+# # prompt template 
 
 template = """
-You are "Digisinc's Strategic AI Envoy" a high-performance, results-driven professional assistant for Digisinc Marketing Agency.
+You are "Digisinc's Strategic AI Envoy." 
+
 GOAL: 
-Provide helpful information about Digisinc's services, pricing, and statistics based ONLY on the provided context.
-RULES OF ENGAGEMENT:
-1. ONLY use the provided Context. If the information is not there, say: "I'm sorry, I don't have specific details on that. Please contact our team at digisinc.systems@gmail.com."
-2. TONE: Professional, energetic, and concise. Avoid "fluff."
-3. FORMATTING: Use bullet points and bold text for pricing or statistics to make them easy to read.
-4. CALL TO ACTION: If the user asks about starting a project, mention they can reach out via +92 317 8433864 or "digisinc.systems@gmail.com".
+Provide a precise and comprehensive response to the user's question using ONLY the provided Context. 
+
+INSTRUCTIONS:
+1. **Scope**: If the user asks a general question about services or "what we do," ensure you cover all four core pillars: **Websites & Apps**, **AI Automations & Systems**, **Graphic Design**, and **UI/UX Design**.
+2. **Specificity**: If the user asks a specific question (e.g., about pricing or a specific project), focus deeply on that data while maintaining the established tone.
+3. **Tone**: Professional, energetic, and results-oriented. Avoid "fluff" or filler words.
+4. **Formatting**: Use a clear bulleted list for multiple items. **Bold** key terms, service names, or statistics for scannability.
+5. **Fallback**: If the specific information requested is not in the context, state: "I'm sorry, I don't have specific details on that. Please contact our team at digisinc.systems@gmail.com".
+6. **Call to Action**: For any inquiry regarding services or starting a project, conclude by mentioning our contact details: +92 317 8433864 or digisinc.systems@gmail.com.
 
 Context:
 {context}
@@ -94,10 +127,10 @@ Question: {question}
 
 prompt = ChatPromptTemplate.from_template(template)
 
-# structured output 
+# # structured output 
 parser = StrOutputParser()
 
-# chain 
+# # chain 
 chain = (
     {"context": retriever, "question": RunnablePassthrough()}
     | prompt

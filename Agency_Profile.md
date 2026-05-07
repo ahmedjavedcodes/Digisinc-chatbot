@@ -44,11 +44,11 @@ To become the global benchmark for purpose-driven innovation, where every digita
 
 ## Services
 
-### We build the tech that drives your Digital Growth
+We build the tech that drives your Digital Growth
 
 We don't just build software, we build growth engines. We follow a singular rule: Every solution from AI automations and custom web apps to UI/UX and graphic design must directly contribute to your bottom line.
 
-#### Websites & Apps
+### Websites & Apps
 
 Your digital interface is your most valuable employee. We engineer custom, high-performance web applications that are fast, reliable, and optimized for seamless cross-device experiences.
 
@@ -57,7 +57,7 @@ Your digital interface is your most valuable employee. We engineer custom, high-
 - **Full Stack Web Apps & E-commerce**
 - **Benefits**: Digital real estate engineered to turn casual visitors into loyal customers.
 
-#### AI Automations & Systems
+### AI Automations & Systems
 
 Scale your business without increasing your headcount. We eliminate manual 'busy work' by building the digital backbone your team needs to move faster and with more precision.
 
@@ -66,7 +66,7 @@ Scale your business without increasing your headcount. We eliminate manual 'busy
 - **Chatbots & Neural Systems**
 - **Benefits**: Replace manual overhead with 24/7 autonomous systems that scale without increasing headcount.
 
-#### Graphic Design
+### Graphic Design
 
 We translate complex brand ideas into high-impact visual assets. From social media kits to high-stakes pitch decks, we design visuals that capture attention and build authority.
 
@@ -75,7 +75,7 @@ We translate complex brand ideas into high-impact visual assets. From social med
 - **Presentation & Pitch Decks**
 - **Benefits**: Stop the scroll with high-impact visuals that demand attention and drive clicks.
 
-#### UI/UX Design
+### UI/UX Design
 
 Design is more than aesthetics; it's conversion science. We build intuitive, high-converting interfaces that guide users effortlessly from curiosity to loyalty.
 
@@ -88,53 +88,49 @@ Design is more than aesthetics; it's conversion science. We build intuitive, hig
 
 ## Projects
 
-### Witness the Digital Transformation
-
 Browse the blueprints of brands we've scaled from 'emerging' to 'essential.' We specialize in the high-stakes digital evolution required to push a brand past its plateau and toward its next peak through performance engineering and relentless optimization.
 
-#### Hijab Store
+### Hijab Store
 
 A luxury e-commerce experience optimized for conversions. We combined high-end aesthetic with seamless UX, resulting in a 40% increase in mobile checkout completion.
-*Tools: HTML5, Tailwindcss, Javascript, Wordpress*
+_Tools: HTML5, Tailwindcss, Javascript, Wordpress
 
-#### Forever - Shopping Brand
+### _Forever - Shopping Brand
 
 Built for speed and scale. A headless React architecture designed to handle high-traffic spikes while maintaining sub-second load times across all devices.
-*Tools: Reactjs, Tailwindcss*
+_Tools: Reactjs, Tailwindcss_
 
-#### Kool Engineering Services
+### Kool Engineering Services
 
 An authoritative corporate portal for industrial experts. Features a precision-led UI to showcase complex technical consulting and engineering solutions.
-*Tools: HTML5, Bootstrap, Javascript, Wordpress*
+_Tools: HTML5, Bootstrap, Javascript, Wordpress_
 
-#### Ys Photography
+### Ys Photography
 
 A visually immersive gallery designed for high-resolution performance. Focused on storytelling through lightning-fast image loading and cinematic layout.
-*Tools: HTML5, Tailwindcss, Javascript*
+_Tools: HTML5, Tailwindcss, Javascript_
 
-#### Saih Al Duba SPC
+### Saih Al Duba SPC
 
 An ISO-standard industrial hub for construction and IoT. Developed to project corporate trust and technical dominance in the Middle Eastern telecom market.
-*Tools: Reactjs, Tailwindcss*
+_Tools: Reactjs, Tailwindcss_
 
-#### Azreesha Visa Company
+### Azreesha Visa Company
 
 A workflow-driven platform for global recruitment. Streamlines complex visa processing with a secure, professional-grade management interface.
-*Tools: Reactjs, Tailwindcss*
+_Tools: Reactjs, Tailwindcss_
 
-#### Abu Tayyab Portfolio
+### Abu Tayyab Portfolio
 
 A personal brand architecture showcasing full-stack capabilities and AI systems. Built with modern UI patterns to prove technical authority.
 
-*Tools: HTML5, Tailwindcss, Javascript*
+_Tools: HTML5, Tailwindcss, Javascript_
 
 ---
 
 ## Pricing
 
-### Transparent pricing for your Digital Evolution
-
-#### Web & Apps
+### Web & Apps
 
 | Tier                   | Best For                     | Includes                                            |
 | :--------------------- | :--------------------------- | :-------------------------------------------------- |
@@ -142,7 +138,7 @@ A personal brand architecture showcasing full-stack capabilities and AI systems.
 | **Intermediate** | Growing businesses           | Multi-page, CMS Integration, Advanced SEO/Analytics |
 | **Premium**      | SaaS startups, online stores | Full E-commerce, Auth & Dashboards, Custom DB/API   |
 
-#### AI Automations
+### AI Automations
 
 | Tier                   | Best For                    | Includes                                                |
 | :--------------------- | :-------------------------- | :------------------------------------------------------ |
@@ -150,7 +146,7 @@ A personal brand architecture showcasing full-stack capabilities and AI systems.
 | **Intermediate** | Growing agencies            | 6 Advanced n8n Workflows, Data Transformation, JS Nodes |
 | **Premium**      | Companies wanting AI Agents | AI Powered n8n Agents, RAG, Neural Systems              |
 
-#### Graphic Design
+### Graphic Design
 
 | Tier                   | Best For         | Includes                                                 |
 | :--------------------- | :--------------- | :------------------------------------------------------- |
@@ -158,7 +154,7 @@ A personal brand architecture showcasing full-stack capabilities and AI systems.
 | **Intermediate** | Scaling brands   | 12 Custom Graphics, Ad Creative Set, Email Templates     |
 | **Premium**      | Product launches | Unlimited Monthly Requests, Campaign Suite, Custom Icons |
 
-#### UI/UX
+### UI/UX
 
 | Tier                   | Best For                    | Includes                                                 |
 | :--------------------- | :-------------------------- | :------------------------------------------------------- |
@@ -172,6 +168,8 @@ A personal brand architecture showcasing full-stack capabilities and AI systems.
 
 **Let's talk.**
 New projects, collaborations, or just a chit-chat. We're ready when you are.
+
+### Contact
 
 - **Inquiries**: digisinc.systems@gmail.com
 - **Direct Call**: +92 317 8433864
