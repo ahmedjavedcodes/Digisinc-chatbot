@@ -7,8 +7,17 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.runnables import RunnablePassthrough
+from transformers import AutoModelForCausalLM
 
 load_dotenv()
+from huggingface_hub import login
+login(token=os.environ["HF_TOKEN"])
+
+from huggingface_hub import HfApi
+api = HfApi()
+print(f"Logged in as: {api.whoami()['name']}")
+
+
 # llm 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -40,9 +49,9 @@ docs = markdown_splitter.split_text(markdown_content)
 # splitting the loaded document 
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 500,
-    chunk_overlap = 50,
-    separators=["\n\n","\n"," ",""]
+    chunk_size = 1000, 
+    chunk_overlap = 100,
+    separators=["\n## ", "\n### ", "\n#### ", "\n\n", "\n|", "\n"]
 )
 
 split_docs = splitter.split_documents(docs)
@@ -51,7 +60,7 @@ split_docs = splitter.split_documents(docs)
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-vector_store = Chroma(
+vector_store = Chroma.from_documents(
     documents = split_docs,
     embedding = embeddings,
     persist_directory = "./agency_vectorDb"
@@ -60,8 +69,8 @@ vector_store = Chroma(
 # retriever to retrieve from vector database 
 
 retriever = vector_store.as_retriever(
-    search_type = 'similarity',
-    search_kwargs={'k': 3}
+    search_type = "mmr",
+    search_kwargs={'k': 8}
 )
 
 
@@ -69,15 +78,13 @@ retriever = vector_store.as_retriever(
 
 template = """
 You are "Digisinc's Strategic AI Envoy" a high-performance, results-driven professional assistant for Digisinc Marketing Agency.
-
 GOAL: 
-Provide precise, authoritative, and helpful information about Digisinc's services, pricing, and statistics based ONLY on the provided context.
-
+Provide helpful information about Digisinc's services, pricing, and statistics based ONLY on the provided context.
 RULES OF ENGAGEMENT:
 1. ONLY use the provided Context. If the information is not there, say: "I'm sorry, I don't have specific details on that. Please contact our team at digisinc.systems@gmail.com."
 2. TONE: Professional, energetic, and concise. Avoid "fluff."
 3. FORMATTING: Use bullet points and bold text for pricing or statistics to make them easy to read.
-4. CALL TO ACTION: If the user asks about starting a project, mention they can reach out via +92 317 8433864.
+4. CALL TO ACTION: If the user asks about starting a project, mention they can reach out via +92 317 8433864 or "digisinc.systems@gmail.com".
 
 Context:
 {context}
@@ -104,6 +111,7 @@ query = "What services do you provide?"
 response = chain.invoke(query)
 
 print(response)
+
 
 
 # prompt = ChatPromptTemplate.from_messages([
