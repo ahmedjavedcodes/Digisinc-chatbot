@@ -105,10 +105,10 @@ Question: {question}
 
 prompt = ChatPromptTemplate.from_template(template)
 
-# # structured output 
+# structured output 
 parser = StrOutputParser()
 
-# # chain 
+# chain 
 chain = (
     {"context": retriever, "question": RunnablePassthrough()}
     | prompt
@@ -116,19 +116,11 @@ chain = (
     | parser
 )
 
-
-# query = "What projects did digisinc cover?"
-
-# response = chain.invoke(query)
-
-# print(response)
-
-
 # 4. Use Async and Ainvoke for the chat endpoint
 @app.post("/chat")
 async def chat(request: ChatRequest):
     try:
-        # ainvoke is the asynchronous version of invoke
+
         response = await chain.ainvoke(request.question)
         return {"answer": response}
     except Exception as e:
@@ -139,9 +131,7 @@ async def chat(request: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    
-    # This part ONLY runs if you type 'python app.py' in your terminal.
-    # It will NOT run when 'gunicorn' or 'uvicorn' starts the app in the cloud.
+
     query = "What projects did digisinc cover?"
     try:
         response = chain.invoke(query)
