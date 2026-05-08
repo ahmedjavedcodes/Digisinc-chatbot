@@ -21,6 +21,17 @@ from langchain_community.document_loaders import PyPDFLoader
 # import pinecone 
 from pinecone import Pinecone
 from langchain_community.vectorstores import Pinecone
+# Import the official SDK for the 'pc' object
+from pinecone import Pinecone as PineconeClient 
+
+# Import the NEW LangChain-specific wrapper
+from langchain_pinecone import PineconeVectorStore
+from sentence_transformers import SentenceTransformer
+
+SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
 
 
 load_dotenv()
@@ -54,14 +65,14 @@ def health_check():
 class ChatRequest(BaseModel):
     question: str
 
-pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-index_name = "digisinc-index"
+pc = PineconeClient(api_key=os.getenv("PINECONE_API_KEY"))
+index_name = "digisinc"
 
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
 
 # Connect to existing Pinecone index (Ensure you've uploaded data once)
-vector_store = Pinecone.from_existing_index(
-    index_name="digisinc-index",
+vector_store = PineconeVectorStore.from_existing_index(
+    index_name="digisinc",
     embedding=embeddings,
     text_key="text"
 )
@@ -76,11 +87,8 @@ retriever = vector_store.as_retriever(
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
-    groq_api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.1,
-    max_tokens=None,
-    timeout=None,
-    max_retries=3
+    groq_api_key=os.getenv("GROQ_API_KEY")
 )
 
 template = """
@@ -118,14 +126,22 @@ chain = (
 
 # 4. Use Async and Ainvoke for the chat endpoint
 @app.post("/chat")
-async def chat(request: ChatRequest):
+async def chat_endpoint(request: ChatRequest):
     try:
-
-        response = await chain.ainvoke(request.question)
-        return {"answer": response}
+        # 1. Capture the question from the request
+        user_query = request.question
+        
+        # 2. Run the chain (using ainvoke for async compatibility)
+        # This creates the 'response' variable that was missing
+        response = await chain.ainvoke(user_query)
+        logger.info(f"response: {response}")
+        
+        # 3. Now you can safely return it
+        return {"response": response}
+        
     except Exception as e:
-        logger.error(f"Chat Error: {e}")
-        return {"error": "Something went wrong. Please try again later."}
+        logger.error(f"ERROR: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
     
 
 
