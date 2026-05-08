@@ -1,18 +1,18 @@
-FROM python:3.10
+# Use a stable Python version
+FROM python:3.11-slim
 
-WORKDIR /code
+# Install system dependencies for C++ builds (fixes the NumPy issue)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+WORKDIR /app
 
-# Create non-root user for Hugging Face
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR $HOME/app
-COPY --chown=user . $HOME/app
+COPY . .
 
-# Since your app.py is in the root, we use app:app
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run using Gunicorn for production-grade stability
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]

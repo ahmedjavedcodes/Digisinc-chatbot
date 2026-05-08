@@ -5,6 +5,9 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
+import logging
+from fastapi import Header, HTTPException
+
 # langchain imports 
 from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -15,22 +18,38 @@ from langchain_chroma import Chroma
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.document_loaders import PyPDFLoader
 
-
+# import pinecone 
 from pinecone import Pinecone
-from langchain_pinecone import PineconeVectorStore
+from langchain_community.vectorstores import Pinecone
 
 
 load_dotenv()
 
 app = FastAPI(title="Digisinc AI Backend")
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# 2. Restrict CORS to your actual domain
+origins = [
+    "https://www.digisinc.systems",
+    "https://digisinc.systems",
+    "http://localhost:3000", # Keep for local testing if needed
+]
+
 # 2. Enable CORS so React can communicate
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
 
 class ChatRequest(BaseModel):
     question: str
@@ -41,11 +60,18 @@ index_name = "digisinc-index"
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # Connect to existing Pinecone index (Ensure you've uploaded data once)
-vector_store = PineconeVectorStore(index_name=index_name, embedding=embeddings)
-
+vector_store = Pinecone.from_existing_index(
+    index_name="digisinc-index",
+    embedding=embeddings,
+    text_key="text"
+)
 retriever = vector_store.as_retriever(
     search_type="mmr",
-    search_kwargs={'k': 5, 'fetch_k': 10, 'lambda_mult': 0.4}
+    search_kwargs={
+        'k': 6, 
+        'fetch_k': 10, 
+        'lambda_mult': 0.5
+        }
 )
 
 llm = ChatGroq(
@@ -91,22 +117,36 @@ chain = (
 )
 
 
-query = "What projects did digisinc cover?"
+# query = "What projects did digisinc cover?"
 
-response = chain.invoke(query)
+# response = chain.invoke(query)
 
-print(response)
+# print(response)
 
 
+# 4. Use Async and Ainvoke for the chat endpoint
 @app.post("/chat")
 async def chat(request: ChatRequest):
     try:
-        # This is what your React app will trigger
-        response = chain.invoke(request.question)
+        # ainvoke is the asynchronous version of invoke
+        response = await chain.ainvoke(request.question)
         return {"answer": response}
     except Exception as e:
-        return {"error": str(e)}
+        logger.error(f"Chat Error: {e}")
+        return {"error": "Something went wrong. Please try again later."}
+    
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # This part ONLY runs if you type 'python app.py' in your terminal.
+    # It will NOT run when 'gunicorn' or 'uvicorn' starts the app in the cloud.
+    query = "What projects did digisinc cover?"
+    try:
+        response = chain.invoke(query)
+        print(f"✅ Startup Test Successful: {response}")
+    except Exception as e:
+        print(f"❌ Startup Test Failed: {e}")
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)    
